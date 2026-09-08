@@ -49,7 +49,8 @@ The diagram below shows the AWS infrastructure, CI/CD pipeline,
 container security scanning and Terraform workflow used to deploy ThreatLens.
 
 
-<img width="1536" height="1024" alt="4a405ff7-1631-4a78-9fac-41987a2653c3" src="https://github.com/user-attachments/assets/ba044d38-5c76-4d82-86bd-216fa21d597a" />
+<img width="1536" height="1024" alt="84274e93-585e-41cc-860e-45b585a25773" src="https://github.com/user-attachments/assets/1a2facfb-0114-46f1-9ace-d5dd55548556" />
+
 
 
 
