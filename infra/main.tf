@@ -48,6 +48,8 @@ module "ecs" {
   subnet_ids         = module.vpc.private_subnet_ids
   security_group_ids = [module.security_groups.ecs_security_group_id]
   target_group_arn   = module.alb.target_group_arn
+
+  aws_region = "eu-west-2"
 }
 
 module "alb" {
@@ -75,4 +77,13 @@ module "route53" {
   alb_zone_id  = module.alb.alb_zone_id
 
   certificate_domain_validation_options = module.acm.domain_validation_options
+}
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  cluster_name             = "threatlens"
+  service_name             = "threatlens"
+  load_balancer_arn_suffix = module.alb.load_balancer_arn_suffix
+  target_group_arn_suffix  = module.alb.target_group_arn_suffix
 }

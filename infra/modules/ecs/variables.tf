@@ -52,3 +52,8 @@ variable "target_group_arn" {
   description = "ARN of the ALB target group"
   type        = string
 }
+
+variable "aws_region" {
+  description = "AWS region used for ECS CloudWatch logging."
+  type        = string
+}

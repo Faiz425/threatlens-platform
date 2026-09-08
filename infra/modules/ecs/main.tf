@@ -6,6 +6,15 @@ resource "aws_ecs_cluster" "this" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/ecs/${var.task_family}"
+  retention_in_days = 30
+
+  tags = {
+    Name = "${var.task_family}-logs"
+  }
+}
+
 resource "aws_ecs_task_definition" "this" {
   family                   = var.task_family
   network_mode             = "awsvpc"
@@ -37,7 +46,18 @@ resource "aws_ecs_task_definition" "this" {
         retries     = 3
         startPeriod = 30
       }
+
+      logConfiguration = {
+        logDriver = "awslogs"
+
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.this.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
     }
+
   ])
 
   tags = {
