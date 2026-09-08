@@ -93,11 +93,11 @@ jobs:
       # -------------------------
 
       - name: Run Checkov
-  uses: bridgecrewio/checkov-action@v12
-  with:
-    directory: infra
-    framework: terraform
-    soft_fail: true
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra
+          framework: terraform
+          soft_fail: true
 
       # -------------------------
       # Terraform Plan
