@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'Docker/**'
+      - 'app.py'
+      - 'scanner.py'
+      - 'requirements.txt'
+      - '.github/workflows/Push-Docker-Image-To-ECR.yml'
 
   workflow_dispatch:
 
