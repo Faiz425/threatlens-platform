@@ -45,7 +45,7 @@ module "ecs" {
   container_image    = "${module.ecr.repository_url}:latest"
   service_name       = "threatlens"
 
-  subnet_ids         = module.vpc.public_subnet_ids
+  subnet_ids         = module.vpc.private_subnet_ids
   security_group_ids = [module.security_groups.ecs_security_group_id]
   target_group_arn   = module.alb.target_group_arn
 }
