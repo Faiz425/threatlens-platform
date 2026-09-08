@@ -676,57 +676,51 @@ The screenshots below show the application, infrastructure and CI/CD pipelines r
 
 ## Live HTTPS Application
 
-![Live Application](docs/images/live-application.png)
+<img width="1159" height="716" alt="Screenshot 2026-09-04 114335" src="https://github.com/user-attachments/assets/bfbfd03f-f1f7-43e3-af6a-ef4fbbbddb98" />
+
 
 ## Health Endpoint
 
-```text
-https://tm.threatlenslab.com/health
-```
+<img width="790" height="649" alt="image" src="https://github.com/user-attachments/assets/0a257c03-4e47-43cc-9fa9-00c85af22293" />
 
-![Health Endpoint](docs/images/health-endpoint.png)
 
 ## ECS Service
 
-The deployed ECS service reached steady state:
 
-```text
-Desired: 1
-Running: 1
-Pending: 0
-```
+<img width="1024" height="590" alt="image" src="https://github.com/user-attachments/assets/189e4cb8-1439-4976-911a-81d69c76adff" />
 
-![ECS Service](docs/images/ecs-service.png)
 
 ## ALB Target Health
 
-The ECS task successfully registered with the target group and reached:
+<img width="1061" height="560" alt="image" src="https://github.com/user-attachments/assets/e5541d57-97f9-4a78-ba0a-cd2e45ded1fb" />
 
-```text
-State: healthy
-```
-
-![ALB Target Health](docs/images/alb-target-health.png)
 
 ## GitHub Actions
 
-![GitHub Actions](docs/images/github-actions.png)
+<img width="1691" height="581" alt="image" src="https://github.com/user-attachments/assets/7627b74e-1e7d-4719-bab8-7d8c61819ca6" />
+<img width="1690" height="584" alt="image" src="https://github.com/user-attachments/assets/d1894d71-8d32-4bc5-826d-f5f82e67595b" />
+
 
 ## Trivy Security Scan
 
-![Trivy](docs/images/trivy.png)
+<img width="1682" height="586" alt="image" src="https://github.com/user-attachments/assets/0bb8826d-ff8e-4b42-bb4e-1253289f318b" />
+
 
 ## Terraform Pipeline
 
-![Terraform](docs/images/terraform.png)
+<img width="1694" height="592" alt="image" src="https://github.com/user-attachments/assets/77db9cb7-14af-4940-b59c-35814e83cd0f" />
+<img width="1685" height="589" alt="image" src="https://github.com/user-attachments/assets/a3b89032-591d-44fe-b83c-af60ab778322" />
+
 
 ## Amazon ECR
 
-![Amazon ECR](docs/images/ecr.png)
+<img width="1023" height="525" alt="image" src="https://github.com/user-attachments/assets/d5a2a03e-062b-472a-bd42-3ec6ae39bbcd" />
+
 
 ## CloudWatch
 
-![CloudWatch](docs/images/cloudwatch.png)
+<img width="1262" height="551" alt="image" src="https://github.com/user-attachments/assets/c8ad458c-d5bf-4b4d-82b0-a9be0a375fe0" />
+
 
 ---
 
