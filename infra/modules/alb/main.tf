@@ -2,9 +2,8 @@ resource "aws_lb" "this" {
   name               = var.name
   internal           = false
   load_balancer_type = "application"
-
-  security_groups = var.security_group_ids
-  subnets         = var.subnet_ids
+  security_groups    = var.security_group_ids
+  subnets            = var.subnet_ids
 
   tags = {
     Name = var.name
@@ -12,22 +11,26 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "this" {
-  name        = "${var.name}-tg"
-  port        = 80
+  name_prefix = "thrt-"
+
+  port        = 8080
   protocol    = "HTTP"
-  target_type = "ip"
   vpc_id      = var.vpc_id
+  target_type = "ip"
 
   health_check {
     enabled             = true
     path                = "/health"
     protocol            = "HTTP"
-    port                = "traffic-port"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
     matcher             = "200"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = {
@@ -41,12 +44,12 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "forward"
+    type = "redirect"
 
-    forward {
-      target_group {
-        arn = aws_lb_target_group.this.arn
-      }
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }
