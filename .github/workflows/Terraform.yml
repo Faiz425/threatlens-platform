@@ -112,7 +112,6 @@ jobs:
         run: |
           terraform plan \
             -out=tfplan \
-            -var="container_image=113462084471.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
 
       # -------------------------
       # Terraform Apply
@@ -136,7 +135,6 @@ jobs:
           terraform plan \
             -destroy \
             -out=destroy.tfplan \
-            -var="container_image=113462084471.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
 
       - name: Terraform Destroy
         if: |
