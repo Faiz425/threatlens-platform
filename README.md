@@ -2,211 +2,558 @@
 
 ### A containerised Flask application deployed to AWS using Terraform, Docker, ECS and GitHub Actions, with container security built into the CI/CD workflow.
 
-[![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?logo=amazon-aws\&logoColor=white)](https://aws.amazon.com/)
-[![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform\&logoColor=white)](https://www.terraform.io/)
-[![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker\&logoColor=white)](https://www.docker.com/)
-[![Amazon ECS](https://img.shields.io/badge/Amazon%20ECS-Containers-FF9900?logo=amazon-aws\&logoColor=white)](https://aws.amazon.com/ecs/)
-[![Amazon ECR](https://img.shields.io/badge/Amazon%20ECR-Registry-FF9900?logo=amazon-aws\&logoColor=white)](https://aws.amazon.com/ecr/)
-[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?logo=github-actions\&logoColor=white)](https://github.com/features/actions)
-[![Trivy](https://img.shields.io/badge/Trivy-Container%20Security-1904DA?logo=aquasecurity\&logoColor=white)](https://trivy.dev/)
-[![Python](https://img.shields.io/badge/Python-Flask-3776AB?logo=python\&logoColor=white)](https://www.python.org/)
-[![Route 53](https://img.shields.io/badge/Route%2053-DNS-FF9900?logo=amazon-aws\&logoColor=white)](https://aws.amazon.com/route53/)
-[![ACM](https://img.shields.io/badge/AWS%20ACM-HTTPS-FF9900?logo=amazon-aws\&logoColor=white)](https://aws.amazon.com/certificate-manager/)
+
+![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?logo=amazonaws&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Containers-2496ED?logo=docker&logoColor=white)
+![ECS](https://img.shields.io/badge/ECS-Fargate-FF9900?logo=amazonecs&logoColor=white)
+![ECR](https://img.shields.io/badge/Amazon-ECR-FF9900?logo=amazonaws&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)
+![OIDC](https://img.shields.io/badge/GitHub-OIDC-181717?logo=github&logoColor=white)
+![Trivy](https://img.shields.io/badge/Trivy-Container_Security-1904DA?logo=aqua&logoColor=white)
+![TFLint](https://img.shields.io/badge/TFLint-Terraform_Lint-7B42BC?logo=terraform&logoColor=white)
+![Checkov](https://img.shields.io/badge/Checkov-IaC_Security-8A2BE2)
+![CloudWatch](https://img.shields.io/badge/CloudWatch-Monitoring-FF4F8B?logo=amazoncloudwatch&logoColor=white)
+![Route 53](https://img.shields.io/badge/Route_53-DNS-8C4FFF?logo=amazonroute53&logoColor=white)
+![ACM](https://img.shields.io/badge/ACM-TLS%2FHTTPS-DD344C?logo=amazonaws&logoColor=white)
+![VPC](https://img.shields.io/badge/AWS_VPC-Networking-FF9900?logo=amazonaws&logoColor=white)
+![ALB](https://img.shields.io/badge/ALB-Load_Balancing-8C4FFF?logo=awselasticloadbalancing&logoColor=white)
+![S3](https://img.shields.io/badge/Amazon_S3-Remote_State-569A31?logo=amazons3&logoColor=white)
+![IAM](https://img.shields.io/badge/AWS_IAM-Security-DD344C?logo=amazonaws&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-Containers-FCC624?logo=linux&logoColor=black)
+![Python](https://img.shields.io/badge/Python-Flask-3776AB?logo=python&logoColor=white)
+![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git&logoColor=white)
 
 **Live application:** https://tm.threatlenslab.com
 
 ## Key Features
 
-- Containerised Flask application
-- AWS ECS deployment
+- Containerised Python/Flask application
+- AWS ECS Fargate deployment
+- ECS tasks deployed in private subnets
+- No public IP assigned to application containers
+- Internet-facing Application Load Balancer
+- HTTPS using AWS Certificate Manager
+- HTTP → HTTPS redirection
+- Custom DNS using Route 53
 - Amazon ECR container registry
-- Terraform Infrastructure as Code
+- Modular Terraform Infrastructure as Code
+- S3 remote Terraform state
+- Native S3 state locking
 - GitHub Actions CI/CD
 - GitHub OIDC authentication
+- SHA-based Docker image tagging
 - Trivy container vulnerability scanning
-- Application Load Balancer
-- Route 53 custom DNS
-- HTTPS with AWS Certificate Manager
-- S3 remote Terraform state and locking
+- TFLint Terraform linting
+- Checkov Infrastructure as Code security scanning
+- Non-root container runtime
+- Multi-stage Docker build
+- CloudWatch application logging
+- CloudWatch infrastructure alarms
+- NAT Gateway for private-subnet outbound connectivity
+
 
 ---
 
 ##  Project Overview
 
-ThreatLens is a hands-on DevSecOps project built around a small Flask application and deployed to AWS.
+ThreatLens is a hands-on DevSecOps project that demonstrates how a containerised application can be securely built, scanned, provisioned and deployed to AWS using Infrastructure as Code and CI/CD.
 
-The project takes the application through a complete workflow:
+The application runs on **Amazon ECS Fargate inside private subnets** with no public IP address. An internet-facing Application Load Balancer provides the public entry point, terminates TLS and forwards traffic to the application on port `8080`.
 
-**Code → Docker → Security Scan → Amazon ECR → Amazon ECS → Load Balancer → HTTPS**
+Terraform manages the AWS infrastructure while GitHub Actions automates infrastructure validation, container security scanning, image publishing and ECS deployment.
 
-The infrastructure is managed using Terraform, while GitHub Actions automates the CI/CD process. Trivy is included in the pipeline to scan the container image for known vulnerabilities before deployment.
+GitHub Actions authenticates to AWS using **OIDC and short-lived credentials**, removing the need to store long-lived AWS access keys in GitHub.
 
-The application is publicly accessible through a custom domain over HTTPS.
+
 
 ## Architecture
 
 The diagram below shows the AWS infrastructure, CI/CD pipeline,
 container security scanning and Terraform workflow used to deploy ThreatLens.
 
-
-<img width="1536" height="1024" alt="84274e93-585e-41cc-860e-45b585a25773" src="https://github.com/user-attachments/assets/1a2facfb-0114-46f1-9ace-d5dd55548556" />
-
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f047830b-e7a7-45a9-9a17-d018226a7d56" />
 
 
 
-
-
-
-##  What I Wanted to Build
-
-Rather than building the application and infrastructure separately, I wanted to bring the different parts of a DevSecOps workflow together.
-
-The project gave me practical experience with:
-
-* Infrastructure as Code
-* Containerisation
-* AWS networking
-* ECS deployments
-* Container registries
-* CI/CD
-* IAM and GitHub OIDC
-* Container vulnerability scanning
-* HTTPS and DNS
-* Terraform remote state
-* Troubleshooting real deployment issues
-
----
 
 ##  Deployment Workflow
 
 ```text
-                         GitHub
-                           │
-                           ▼
-                    GitHub Actions
-                           │
-              ┌────────────┴────────────┐
-              │                         │
-          Docker Build                Trivy
-              │                    Security Scan
-              │                         │
-              └────────────┬────────────┘
-                           │
-                           ▼
-                      Amazon ECR
-                           │
-                           ▼
-                      Amazon ECS
-                           │
-                           ▼
-                Application Load Balancer
-                           │
-                           ▼
-                  HTTPS / ACM Certificate
-                           │
-                           ▼
-                       Route 53
-                           │
-                           ▼
-                tm.threatlenslab.com
+Code
+  ↓
+GitHub
+  ↓
+GitHub Actions
+  ├── Terraform → TFLint → Checkov → Plan / Apply
+  └── Docker Build → Trivy → Amazon ECR → ECS Deployment
+                                             ↓
+                                        ECS Fargate
+                                             ↓
+                                      ALB / HTTPS
+                                             ↓
+                                  tm.threatlenslab.com
 ```
-
-### AWS Network
-
-The application is deployed inside a dedicated VPC in:
-
-```text
-eu-west-2 (London)
-```
-
-VPC:
-
-```text
-10.0.0.0/16
-```
-
-Public subnets:
-
-```text
-eu-west-2a
-10.0.0.0/24
-
-eu-west-2b
-10.0.1.0/24
-```
-
-The VPC contains:
-
-* Internet Gateway
-* Public route table
-* Two public subnets
-* Application Load Balancer
-* ECS service
-* Security groups
-
-
 
 ---
 
-##  AWS Services
 
-### Amazon ECS
 
-The Flask application runs as a container using Amazon ECS.
 
-The deployment includes:
+The infrastructure is deployed in AWS `eu-west-2` across two Availability Zones.
 
-* ECS cluster
-* ECS task definition
-* ECS service
-* ECS execution role
-* ECS security group
-
-The ECS service is connected to the Application Load Balancer target group.
-
-### Amazon ECR
-
-The Docker image is stored in an ECR repository named:
+### Request Flow
 
 ```text
-threatlens
+Internet
+   │
+   ▼
+Route 53
+   │
+   ▼
+Application Load Balancer
+Public Subnets
+   │
+   ├── HTTP :80 → 301 Redirect → HTTPS :443
+   │
+   ▼
+Target Group
+HTTP :8080
+   │
+   ▼
+ECS Fargate
+Private Subnets
+assign_public_ip = false
+   │
+   ▼
+Gunicorn / Flask
+Port 8080
+Non-root appuser
 ```
 
-Image:
+Only the Application Load Balancer is internet-facing. ECS tasks remain within private subnets and receive application traffic through the ALB.
+
+
+
+# AWS Infrastructure
+
+## VPC & Networking
+
+ThreatLens runs inside a dedicated VPC:
 
 ```text
-113462084471.dkr.ecr.eu-west-2.amazonaws.com/threatlens:latest
+Region: eu-west-2
+VPC:    10.0.0.0/16
 ```
 
-### Application Load Balancer
+The network spans two Availability Zones.
 
-The ALB provides the public entry point for the application.
+### Public Subnets
 
-Traffic is forwarded from the load balancer to the ECS service through the target group.
+```text
+10.0.0.0/24 — eu-west-2a
+10.0.1.0/24 — eu-west-2b
+```
 
-The target health check is configured against the application and currently reports the ECS target as **healthy**.
+The public layer contains the internet-facing Application Load Balancer.
 
-### Route 53
+A NAT Gateway provides outbound connectivity for workloads running inside the private subnets.
 
-Route 53 provides DNS for the custom application domain.
+### Private Subnets
+
+```text
+10.0.2.0/24 — eu-west-2a
+10.0.3.0/24 — eu-west-2b
+```
+
+The ECS Fargate service runs within the private subnet tier.
+
+```hcl
+assign_public_ip = false
+```
+
+This prevents ECS tasks from being directly exposed to the internet.
+
+### Security Groups
+
+Traffic between the load balancer and application is restricted using security-group references.
+
+```text
+Internet
+   │
+   │ 80 / 443
+   ▼
+ALB Security Group
+   │
+   │ TCP 8080
+   ▼
+ECS Security Group
+```
+
+The ECS security group accepts application traffic on port `8080` from the ALB security group rather than from the public internet.
+
+---
+
+# Containerisation
+
+The application is packaged using Docker and served by Gunicorn.
+
+The production container:
+
+- Uses an Alpine-based runtime
+- Uses a multi-stage build
+- Runs as an unprivileged `appuser`
+- Uses Gunicorn instead of the Flask development server
+- Exposes port `8080`
+- Includes a container health check
+- Uses a `.dockerignore` to reduce build context
+
+The application runs as:
+
+```text
+USER appuser
+Gunicorn → 0.0.0.0:8080
+```
+
+Using port `8080` allows the application to run without root privileges while the ALB continues to expose standard HTTP/HTTPS ports externally.
+
+### Image Optimisation
+
+The original image was approximately:
+
+```text
+230 MB
+```
+
+After moving to the optimized Alpine-based build:
+
+```text
+140 MB
+```
+
+This reduced the Docker image size by approximately **39%**.
+
+---
+
+# CI/CD
+
+GitHub Actions provides separate workflows for application delivery, security scanning, infrastructure deployment and ECS deployment.
+
+```text
+.github/workflows/
+├── Push-Docker-Image-To-ECR.yml
+├── Deploy-ECS.yml
+├── Terraform.yml
+└── trivy.yml
+```
+
+## Application Pipeline
+
+Application changes follow:
+
+```text
+Git Push
+   │
+   ▼
+GitHub Actions
+   │
+   ▼
+Build Docker Image
+   │
+   ▼
+Trivy Scan
+   │
+   ▼
+Authenticate to AWS using OIDC
+   │
+   ▼
+Push Image to Amazon ECR
+   │
+   ├── latest
+   └── Git commit SHA
+   │
+   ▼
+Register ECS Task Definition
+   │
+   ▼
+Deploy ECS Service
+```
+
+Using Git commit SHA tags provides traceability between a deployed container and the source code used to build it.
+
+---
+
+# Infrastructure CI
+
+Terraform changes are automatically checked before infrastructure changes are deployed.
+
+The pipeline runs:
+
+```text
+terraform fmt
+      ↓
+terraform init
+      ↓
+terraform validate
+      ↓
+TFLint
+      ↓
+Checkov
+      ↓
+terraform plan
+      ↓
+terraform apply
+```
+
+### TFLint
+
+TFLint provides Terraform-specific linting and catches configuration and provider issues before deployment.
+
+### Checkov
+
+Checkov scans the Terraform configuration for infrastructure security and configuration issues.
+
+It currently runs in advisory mode, allowing findings to be reviewed while keeping the project pipeline usable during development.
+
+### Terraform Plan
+
+Infrastructure changes are previewed using:
+
+```bash
+terraform plan -out=tfplan
+```
+
+This makes the proposed infrastructure changes visible before they are applied.
+
+---
+
+# GitHub OIDC & IAM
+
+GitHub Actions authenticates to AWS using OpenID Connect.
+
+```text
+GitHub Actions
+      │
+      │ OIDC
+      ▼
+AWS STS
+      │
+      │ AssumeRole
+      ▼
+threatlens-github-actions-role
+```
+
+This avoids storing long-lived:
+
+```text
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+```
+
+inside GitHub.
+
+Instead, GitHub Actions receives temporary AWS credentials by assuming the dedicated IAM role.
+
+The ECS workload uses a separate execution role:
+
+```text
+threatlens-ecs-execution-role
+```
+
+This separates CI/CD permissions from the permissions required by the ECS task.
+
+---
+
+# Container Security
+
+## Trivy
+
+Trivy is integrated into the CI/CD workflow and scans the Docker image for known vulnerabilities before deployment.
+
+The pipeline checks for:
+
+```text
+HIGH
+CRITICAL
+```
+
+severity vulnerabilities.
+
+This makes vulnerability scanning part of the delivery process rather than relying solely on manual security checks after deployment.
+
+---
+
+# Amazon ECS Fargate
+
+The Flask application runs using Amazon ECS Fargate.
+
+The deployment consists of:
+
+- ECS cluster
+- Task definition
+- ECS service
+- Fargate task
+- ECS execution role
+- CloudWatch logging
+- ALB target group integration
+
+The current validated deployment reached:
+
+```text
+Desired: 1
+Running: 1
+Pending: 0
+```
+
+The Application Load Balancer target also reported:
+
+```text
+State: healthy
+```
+
+---
+
+# Load Balancing & HTTPS
+
+The Application Load Balancer is deployed across the two public subnets.
+
+### HTTP Listener
+
+```text
+Port 80
+   │
+   └── 301 Redirect → HTTPS :443
+```
+
+### HTTPS Listener
+
+```text
+HTTPS :443
+     │
+     ▼
+Target Group
+HTTP :8080
+     │
+     ▼
+ECS Fargate :8080
+```
+
+TLS is terminated at the ALB using a certificate provisioned through AWS Certificate Manager.
+
+Internal ALB-to-container communication uses HTTP on port `8080`.
+
+---
+
+# DNS
+
+Amazon Route 53 provides DNS for:
 
 ```text
 tm.threatlenslab.com
 ```
 
-### AWS Certificate Manager
+The DNS record directs users to the Application Load Balancer.
 
-ACM provides the TLS certificate used by the HTTPS listener.
+The public application is therefore accessed through:
 
-This allows the application to be accessed securely over HTTPS.
+```text
+https://tm.threatlenslab.com
+```
+
+rather than directly through an ECS task or IP address.
 
 ---
 
-##  Application
+# Monitoring & Logging
 
-ThreatLens is a lightweight Flask application written in Python.
+Application logs are sent from ECS to Amazon CloudWatch Logs.
 
-The application exposes two main routes:
+```text
+/ecs/threatlens
+```
+
+Log retention is configured for:
+
+```text
+30 days
+```
+
+CloudWatch alarms monitor:
+
+| Metric | Trigger |
+|---|---|
+| ECS CPU utilisation | ≥ 80% |
+| ECS memory utilisation | ≥ 80% |
+| ALB unhealthy targets | ≥ 1 |
+| ALB target 5XX responses | ≥ 5 |
+
+This provides visibility into application health and ECS resource utilisation.
+
+---
+
+# Terraform Infrastructure as Code
+
+The AWS environment is provisioned using reusable Terraform modules.
+
+```text
+infra/
+├── main.tf
+├── provider.tf
+├── variables.tf
+├── outputs.tf
+│
+└── modules/
+    ├── acm/
+    ├── alb/
+    ├── ecr/
+    ├── ecs/
+    ├── iam/
+    ├── monitoring/
+    ├── route53/
+    ├── security-groups/
+    └── vpc/
+```
+
+This keeps networking, compute, security, monitoring and supporting AWS services separated into reusable components.
+
+---
+
+# Remote Terraform State
+
+Terraform state is stored remotely in Amazon S3.
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket       = "threatlens-terraform-state-113462084471"
+    key          = "threatlens/terraform.tfstate"
+    region       = "eu-west-2"
+    use_lockfile = true
+  }
+}
+```
+
+Native S3 state locking is enabled using:
+
+```hcl
+use_lockfile = true
+```
+
+This protects against concurrent Terraform operations modifying the same state.
+
+The backend infrastructure is managed separately through:
+
+```text
+bootstrap/
+```
+
+---
+
+# Application
+
+ThreatLens is a lightweight Python Flask application.
+
+The main routes are:
 
 ```text
 /
@@ -226,332 +573,72 @@ The health endpoint returns:
 }
 ```
 
-The application listens on port `8080` inside the container.
+The endpoint is used for application and load balancer health checks.
 
 ---
 
-##  Running Locally
+# Running Locally
 
-Clone the repository and move into the project:
-
-```bash
-git clone <your-repository-url>
-cd ThreatLens
-```
-
-Create and activate a virtual environment:
+Clone the repository:
 
 ```bash
-python -m venv .venv
+git clone https://github.com/Faiz425/threatlens-platform.git
+cd threatlens-platform
 ```
 
-Windows:
+Build the production container:
 
 ```bash
-source .venv/Scripts/activate
+docker build -t threatlens:local -f Docker/Dockerfile .
 ```
 
-Install the dependencies:
+Run it:
 
 ```bash
-pip install -r app/requirements.txt
+docker run --rm -p 8080:8080 threatlens:local
 ```
 
-Run the application:
+Test the application:
 
 ```bash
-python app/app.py
+curl http://localhost:8080
 ```
 
-The application should then be available at:
-
-```text
-http://localhost:8080
-```
-
-Health check:
+Test the health endpoint:
 
 ```bash
 curl http://localhost:8080/health
 ```
 
----
+Expected response:
 
-##  Docker
+```json
+{"status":"ok"}
+```
 
-The application is packaged into a Docker image for consistent deployment.
-
-Build:
+You can also expose local port `80` while keeping the container on its non-root port:
 
 ```bash
-docker build -t threatlens:dev .
-```
-
-Run:
-
-```bash
-docker run -p 8080:8080 threatlens:dev
-```
-
-Then visit:
-
-```text
-http://localhost:8080
-```
-
-Health check:
-
-```bash
-curl http://localhost:8080/health
+docker run --rm -p 80:8080 threatlens:local
 ```
 
 ---
 
-##  CI/CD
-
-GitHub Actions is used to automate the build and deployment workflow.
-
-The pipeline is designed around the following process:
+# Project Structure
 
 ```text
-Push to GitHub
-      │
-      ▼
-Checkout
-      │
-      ▼
-Authenticate to AWS
-      │
-      ▼
-Build Docker Image
-      │
-      ▼
-Run Trivy Scan
-      │
-      ▼
-Push Image to ECR
-      │
-      ▼
-Terraform
-      │
-      ▼
-ECS Deployment
-```
-
-The workflow uses GitHub OIDC to authenticate to AWS rather than storing long-lived AWS access keys inside GitHub.
-
-This was an important part of the project because it keeps AWS credentials out of the repository and allows GitHub Actions to assume a dedicated IAM role.
-
----
-
-##  Container Security
-
-### Trivy
-
-Trivy is integrated into the CI/CD workflow to scan the Docker image for known vulnerabilities.
-
-I also used Trivy locally during development:
-
-```bash
-trivy image threatlens:dev
-```
-
-The scan helped identify vulnerabilities within the image and gave me a better understanding of the security implications of the packages included in a container.
-
-Security scanning is therefore part of the workflow rather than something checked manually after deployment.
-
----
-
-##  IAM & GitHub OIDC
-
-GitHub Actions assumes a dedicated AWS IAM role:
-
-```text
-threatlens-github-actions-role
-```
-
-The ECS task uses a separate execution role:
-
-```text
-threatlens-ecs-execution-role
-```
-
-Separating these roles keeps the CI/CD permissions separate from the permissions required by the ECS task.
-
----
-
-## Infrastructure as Code
-
-Terraform is used to create and manage the AWS infrastructure.
-
-The infrastructure is split into modules rather than keeping everything inside one large Terraform file.
-
-```text
-infra/
-│
-├── main.tf
-├── provider.tf
-├── variables.tf
-├── outputs.tf
-│
-└── modules/
-    ├── vpc/
-    ├── ecr/
-    ├── iam/
-    ├── security-groups/
-    ├── ecs/
-    ├── alb/
-    ├── acm/
-    └── route53/
-```
-
-Common Terraform commands used during development:
-
-```bash
-terraform init
-terraform fmt
-terraform validate
-terraform plan
-terraform apply
-```
-
-Terraform state is stored remotely using an Amazon S3 backend.
-
----
-
-##  Remote Terraform State
-
-Terraform state is stored remotely in Amazon S3, with S3 native state locking enabled using use_lockfile = true. This helps prevent concurrent Terraform operations from modifying the state at the same time.
-
----
-
-#  Challenges & Troubleshooting
-
-One of the most useful parts of the project was dealing with issues during deployment.
-
-The infrastructure didn't work perfectly on the first attempt, which gave me the opportunity to troubleshoot the AWS environment rather than simply following a successful deployment.
-
-### VPC limit
-
-I reached the AWS VPC limit after creating several VPCs during development.
-
-I used AWS CLI commands to identify the existing VPCs, subnets and internet gateways and cleaned up resources that were no longer required.
-
-**What I learned:** AWS resource limits can affect Terraform deployments, and understanding the dependency relationships between resources is important when cleaning up infrastructure.
-
-### Existing AWS resources
-
-Terraform initially attempted to create resources that already existed, including:
-
-* ECR repository
-* IAM role
-* ALB target group
-
-Instead of assuming the Terraform configuration was wrong, I checked the existing AWS resources and compared them with Terraform state.
-
-**What I learned:** An AWS resource existing does not automatically mean Terraform is managing it.
-
-### IAM permission errors
-
-The GitHub Actions role initially lacked several permissions required by Terraform.
-
-For example:
-
-```text
-ec2:AuthorizeSecurityGroupEgress
-iam:ListRolePolicies
-```
-
-The pipeline failed with `AccessDenied` errors.
-
-I investigated the failed actions and updated the IAM policy attached to the GitHub Actions role.
-
-**What I learned:** Terraform requires permissions for both creating resources and reading/refreshing existing resources during a plan.
-
-### S3 backend permissions
-
-After moving Terraform state to S3, GitHub Actions initially received a `403 Forbidden` error when attempting to access the state file.
-
-I updated the permissions for the GitHub Actions role so Terraform could access the remote state.
-
-**What I learned:** Moving state to a remote backend introduces another part of the AWS permission model that needs to be accounted for.
-
-### ECS / ALB health checks
-
-During deployment, one ECS target entered a draining state while the replacement target was being registered.
-
-After the new target started successfully, the ALB reported:
-
-```text
-State: healthy
-```
-
-The application then loaded correctly through the public HTTPS endpoint.
-
-**What I learned:** ECS deployments and load balancer target registration can involve a transition period, so checking target health is important when troubleshooting an application that appears unavailable.
-
----
-
-## 📸 Screenshots
-
-The repository includes screenshots showing the actual deployment.
-
-### Live Application
-
-<img width="1159" height="716" alt="Screenshot 2026-09-04 114335" src="https://github.com/user-attachments/assets/076eb459-e43d-461b-938b-cf5216f239d0" />
-
-
-### GitHub Actions
-
-<img width="2478" height="1306" alt="image" src="https://github.com/user-attachments/assets/b5996efc-1ebd-4f9d-a1cf-cc1bebdd5f12" />
-
-<img width="2475" height="1273" alt="image" src="https://github.com/user-attachments/assets/11184b24-b329-4f46-9283-f272510a06d1" />
-
-
-### Trivy
-
-<img width="2463" height="958" alt="image" src="https://github.com/user-attachments/assets/18791f61-8fa5-42d7-ba35-247e1deec423" />
-
-
-### Amazon ECR
-
-<img width="2493" height="742" alt="image" src="https://github.com/user-attachments/assets/3f667569-5a00-4f4a-8f9b-be51036dcad7" />
-
-
-<img width="1954" height="580" alt="image" src="https://github.com/user-attachments/assets/de065924-ae94-48a1-8b7f-56156f09322f" />
-
-
-### Amazon ECS
-
-<img width="2067" height="760" alt="image" src="https://github.com/user-attachments/assets/fa2eb161-000d-4459-8925-2c6b72f89df9" />
-
-
-### ALB Target Health
-
-<img width="2088" height="732" alt="image" src="https://github.com/user-attachments/assets/baffab9b-b0c5-467c-a3c1-c5f6fdd09041" />
-
-
-### Terraform
-
-<img width="2473" height="1282" alt="image" src="https://github.com/user-attachments/assets/92536387-d31d-49e3-b353-67a316b15e0a" />
-
-<img width="2470" height="1212" alt="image" src="https://github.com/user-attachments/assets/0a4ae6fc-83d7-4ef7-99cf-e625690afbc9" />
-
-
-
----
-
-##  Project Structure
-
-```text
-ThreatLens/
+threatlens-platform/
 │
 ├── app/
 │   ├── app.py
+│   ├── scanner.py
 │   └── requirements.txt
 │
-├── docker/
+├── Docker/
 │   └── Dockerfile
+│
+├── bootstrap/
+│   └── main.tf
 │
 ├── infra/
 │   ├── main.tf
@@ -560,17 +647,22 @@ ThreatLens/
 │   ├── outputs.tf
 │   │
 │   └── modules/
-│       ├── vpc/
-│       ├── ecr/
-│       ├── iam/
-│       ├── security-groups/
-│       ├── ecs/
-│       ├── alb/
 │       ├── acm/
-│       └── route53/
+│       ├── alb/
+│       ├── ecr/
+│       ├── ecs/
+│       ├── iam/
+│       ├── monitoring/
+│       ├── route53/
+│       ├── security-groups/
+│       └── vpc/
 │
 ├── .github/
 │   └── workflows/
+│       ├── Deploy-ECS.yml
+│       ├── Push-Docker-Image-To-ECR.yml
+│       ├── Terraform.yml
+│       └── trivy.yml
 │
 ├── .gitignore
 └── README.md
@@ -578,59 +670,241 @@ ThreatLens/
 
 ---
 
-## What I Learned
+# Deployment Evidence
 
-This project helped me move beyond learning individual DevOps tools and understand how they work together in a real deployment.
+The screenshots below show the application, infrastructure and CI/CD pipelines running successfully.
 
-The main areas I gained practical experience in were:
+## Live HTTPS Application
 
-* AWS networking
-* Terraform and modular IaC
-* Docker
-* Amazon ECS
-* Amazon ECR
-* Application Load Balancers
-* IAM
-* GitHub OIDC
-* GitHub Actions
-* Route 53
-* AWS Certificate Manager
-* Terraform remote state
-* Container security with Trivy
-* Debugging AWS and Terraform issues
+![Live Application](docs/images/live-application.png)
 
-The troubleshooting was particularly useful because several failures were caused by things outside the immediate Terraform configuration, such as AWS resource limits, existing resources and IAM permissions.
+## Health Endpoint
+
+```text
+https://tm.threatlenslab.com/health
+```
+
+![Health Endpoint](docs/images/health-endpoint.png)
+
+## ECS Service
+
+The deployed ECS service reached steady state:
+
+```text
+Desired: 1
+Running: 1
+Pending: 0
+```
+
+![ECS Service](docs/images/ecs-service.png)
+
+## ALB Target Health
+
+The ECS task successfully registered with the target group and reached:
+
+```text
+State: healthy
+```
+
+![ALB Target Health](docs/images/alb-target-health.png)
+
+## GitHub Actions
+
+![GitHub Actions](docs/images/github-actions.png)
+
+## Trivy Security Scan
+
+![Trivy](docs/images/trivy.png)
+
+## Terraform Pipeline
+
+![Terraform](docs/images/terraform.png)
+
+## Amazon ECR
+
+![Amazon ECR](docs/images/ecr.png)
+
+## CloudWatch
+
+![CloudWatch](docs/images/cloudwatch.png)
 
 ---
 
-##  Future Improvements
+# Troubleshooting
 
-There are several areas I would improve if I continued developing the project:
+One of the most valuable parts of this project was diagnosing issues across multiple layers of the deployment.
 
-* Add CloudWatch logging and monitoring
-* Add ECS service autoscaling
-* Introduce AWS WAF
-* Move application secrets into AWS Secrets Manager
-* Add more automated application tests
-* Improve the container image and reduce its attack surface
-* Introduce blue/green or rolling deployment improvements
+## Non-Root Container & Port 80
+
+After changing the production container to run as an unprivileged user, ECS tasks repeatedly stopped.
+
+CloudWatch showed:
+
+```text
+connection to ('0.0.0.0', 80) failed: [Errno 13] Permission denied
+```
+
+The application was attempting to bind Gunicorn to privileged port `80`.
+
+I moved the internal application port to:
+
+```text
+8080
+```
+
+and updated the:
+
+- Dockerfile
+- Docker health check
+- ECS task definition
+- ECS port mapping
+- Security group
+- ALB target group
+
+The final architecture became:
+
+```text
+Internet
+   │
+HTTPS :443
+   ▼
+ALB
+   │
+HTTP :8080
+   ▼
+ECS Fargate
+   │
+   ▼
+Gunicorn :8080
+USER appuser
+```
+
+This allowed the container to remain non-root while the public application continued using standard HTTPS.
+
+## ALB Target Group Replacement
+
+Changing the target group from port `80` to `8080` required Terraform to replace the resource.
+
+The first deployment failed because the existing target group was still referenced by an ALB listener.
+
+The target group was updated to support safe replacement:
+
+```hcl
+lifecycle {
+  create_before_destroy = true
+}
+```
+
+A generated name prefix was also used so the new and old target groups could temporarily coexist during replacement.
+
+## Container Image Version
+
+After updating the ECS configuration to `8080`, a task still attempted to start Gunicorn on port `80`.
+
+I compared:
+
+```text
+Git commit
+     ↓
+Docker build
+     ↓
+ECR image tag
+     ↓
+ECR image digest
+     ↓
+ECS task definition
+     ↓
+Running ECS task
+```
+
+This showed that the deployed ECR image had been built from an earlier Dockerfile.
+
+After committing the corrected Dockerfile, rebuilding the image and deploying the new task definition, ECS reached steady state and the ALB target became healthy.
+
+## IAM & S3 State
+
+The Terraform pipeline also encountered IAM `AccessDenied` and S3 state-locking permission errors.
+
+I traced the failed AWS API calls and updated the permissions required by the GitHub Actions IAM role.
+
+OIDC authentication was retained throughout rather than replacing it with static AWS access keys.
 
 ---
 
-##  Project Status
+# What I Learned
 
-**Completed and deployed.**
+This project helped me understand how individual DevOps tools connect together in a complete deployment.
 
-The application is running on AWS and is available publicly over HTTPS.
+The main areas I gained practical experience with were:
 
- **Live application:**
-https://tm.threatlenslab.com
+- AWS VPC networking
+- Public and private subnet design
+- NAT Gateway routing
+- ECS Fargate
+- Amazon ECR
+- Application Load Balancers
+- Route 53 and DNS
+- AWS Certificate Manager
+- IAM and least-privilege concepts
+- GitHub OIDC
+- Terraform modules
+- Terraform remote state and locking
+- Docker multi-stage builds
+- Non-root container security
+- GitHub Actions
+- CI/CD
+- Trivy
+- TFLint
+- Checkov
+- CloudWatch logs and alarms
+- Debugging ECS task failures
+- ALB health checks
+- Container image/version traceability
+
+The troubleshooting was particularly valuable because failures had to be followed across **GitHub Actions → IAM → Terraform → ECR → ECS → ALB → CloudWatch**, rather than debugging each component in isolation.
 
 ---
 
-## Author
+# Future Improvements
+
+The current deployment meets the goals of the project, but further production hardening could include:
+
+- ECS service autoscaling
+- AWS WAF
+- VPC Flow Logs
+- ALB access logging
+- ECS Container Insights
+- KMS encryption where appropriate
+- AWS Secrets Manager if application secrets are introduced
+- Additional unit and integration tests
+- Blue/green deployments
+- Multi-AZ NAT Gateway design for higher availability
+- Further remediation of Checkov findings
+
+---
+
+# Project Status
+
+**Successfully deployed and validated.**
+
+```text
+ECS Desired Tasks : 1
+ECS Running Tasks : 1
+ECS Pending Tasks : 0
+ALB Target        : Healthy
+HTTPS             : Enabled
+ECS Public IP     : Disabled
+Container User    : Non-root
+Application Port  : 8080
+CI/CD             : Passing
+```
+
+**Live:** https://tm.threatlenslab.com
+
+---
+
+# Author
 
 **Faizan Akbar**
 
-Hands-on DevSecOps / Cloud project focused on AWS, Infrastructure as Code, containers, CI/CD and security.
-
+DevOps / Cloud / DevSecOps portfolio project focused on AWS, Terraform, Docker, CI/CD, Infrastructure as Code and cloud security.
