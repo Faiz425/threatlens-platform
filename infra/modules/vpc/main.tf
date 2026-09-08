@@ -29,6 +29,21 @@ resource "aws_subnet" "public" {
   }
 }
 
+resource "aws_subnet" "private" {
+  count = length(var.availability_zones)
+
+  vpc_id            = aws_vpc.this.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + length(var.availability_zones))
+  availability_zone = var.availability_zones[count.index]
+
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "${var.name}-private-${count.index + 1}"
+  }
+}
+
+
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
