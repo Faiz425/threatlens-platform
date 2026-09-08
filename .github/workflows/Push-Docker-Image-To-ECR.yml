@@ -6,9 +6,7 @@ on:
       - main
     paths:
       - 'Docker/**'
-      - 'app.py'
-      - 'scanner.py'
-      - 'requirements.txt'
+      - 'app/**'
       - '.github/workflows/Push-Docker-Image-To-ECR.yml'
 
   workflow_dispatch:
