@@ -1,7 +1,18 @@
-
 name: Terraform
 
 on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform.yml"
+
   workflow_dispatch:
     inputs:
       action:
@@ -14,12 +25,6 @@ on:
           - destroy
         default: plan
 
-  push:
-    branches:
-      - main
-    paths:
-      - "infra/**"
-
 permissions:
   id-token: write
   contents: read
@@ -27,11 +32,22 @@ permissions:
 env:
   AWS_REGION: eu-west-2
   ECR_REPOSITORY: threatlens
+  TF_IN_AUTOMATION: true
+  TF_INPUT: false
+
+concurrency:
+  group: threatlens-terraform
+  cancel-in-progress: false
 
 jobs:
   terraform:
     name: Terraform ${{ github.event.inputs.action || 'plan' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: infra
 
     steps:
       - name: Checkout repository
@@ -46,37 +62,84 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init
+      # -------------------------
+      # Terraform quality checks
+      # -------------------------
 
       - name: Terraform Format Check
-        working-directory: infra
         run: terraform fmt -check -recursive
 
+      - name: Terraform Init
+        run: terraform init
+
       - name: Terraform Validate
-        working-directory: infra
         run: terraform validate
 
+      # -------------------------
+      # Terraform linting
+      # -------------------------
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v5
+
+      - name: Initialise TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint --recursive
+
+      # -------------------------
+      # IaC security scanning
+      # -------------------------
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra
+          framework: terraform
+
+      # -------------------------
+      # Terraform Plan
+      # -------------------------
+
       - name: Terraform Plan
-        if: ${{ github.event_name == 'push' || github.event.inputs.action == 'plan' }}
-        working-directory: infra
+        if: |
+          github.event_name == 'push' ||
+          github.event_name == 'pull_request' ||
+          (github.event_name == 'workflow_dispatch' &&
+           (github.event.inputs.action == 'plan' ||
+            github.event.inputs.action == 'apply'))
         run: |
           terraform plan \
+            -out=tfplan \
             -var="container_image=113462084471.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
 
+      # -------------------------
+      # Terraform Apply
+      # -------------------------
+
       - name: Terraform Apply
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply' }}
-        working-directory: infra
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'apply'
+        run: terraform apply -auto-approve tfplan
+
+      # -------------------------
+      # Terraform Destroy
+      # -------------------------
+
+      - name: Terraform Destroy Plan
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
         run: |
-          terraform apply \
-            -auto-approve \
+          terraform plan \
+            -destroy \
+            -out=destroy.tfplan \
             -var="container_image=113462084471.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
 
       - name: Terraform Destroy
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy' }}
-        working-directory: infra
-        run: |
-          terraform destroy \
-            -auto-approve \
-            -var="container_image=113462084471.dkr.ecr.eu-west-2.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest"
+        if: |
+          github.event_name == 'workflow_dispatch' &&
+          github.event.inputs.action == 'destroy'
+        run: terraform apply -auto-approve destroy.tfplan
