@@ -24,7 +24,6 @@
 ![Python](https://img.shields.io/badge/Python-Flask-3776AB?logo=python&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git&logoColor=white)
 
-**Live application:** https://tm.threatlenslab.com
 
 ## Key Features
 
@@ -72,7 +71,8 @@ GitHub Actions authenticates to AWS using **OIDC and short-lived credentials**, 
 The diagram below shows the AWS infrastructure, CI/CD pipeline,
 container security scanning and Terraform workflow used to deploy ThreatLens.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f047830b-e7a7-45a9-9a17-d018226a7d56" />
+<img width="1614" height="974" alt="image" src="https://github.com/user-attachments/assets/089df2ec-7670-4688-a050-7c78a42e3af7" />
+
 
 
 
